@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Daftar Barang</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 10px; }
+    h2 { text-align: center; }
+    input, select, button { padding: 8px; margin: 5px 0; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    input[type="text"] { width: 100%; box-sizing: border-box; }
+    /* Responsif untuk layar kecil */
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr { display: block; }
+      tr { margin-bottom: 15px; }
+      td { border: none; position: relative; padding-left: 50%; }
+      td:before { 
+        position: absolute; 
+        left: 10px; 
+        top: 8px; 
+        white-space: nowrap; 
+        font-weight: bold;
+      }
+      td:nth-of-type(1):before { content: "Kode #"; }
+      td:nth-of-type(2):before { content: "Nama Barang"; }
+      td:nth-of-type(3):before { content: "Stok"; }
+      td:nth-of-type(4):before { content: "Harga Jual"; }
+      td:nth-of-type(5):before { content: "Kategori"; }
+      td:nth-of-type(6):before { content: "UPC"; }
+      td:nth-of-type(7):before { content: "Aksi"; }
+    }
+  </style>
+</head>
+<body>
+  <h2>Daftar Barang</h2>
+  
+  <!-- Pencarian dan filter -->
+  <input type="text" id="searchBox" placeholder="Cari barang..." onkeyup="filterBarang()">
+  <select id="filterKategori" onchange="filterBarang()">
+    <option value="">Semua Kategori</option>
+    <option value="Umum">Umum</option>
+    <option value="AVIAN">AVIAN</option>
+    <option value="LISTRIK">LISTRIK</option>
+    <option value="SM">SM</option>
+    <option value="38">38</option>
+    <option value="WAA">WAA</option>
+  </select>
+
+  <table id="barangTable">
+    <thead>
+      <tr>
+        <th>Kode #</th>
+        <th>Nama Barang</th>
+        <th>Stok</th>
+        <th>Harga Jual</th>
+        <th>Kategori</th>
+        <th>UPC</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <button onclick="tambahBaris()">Tambah Barang</button>
+
+  <script>
+    let dataBarang = [
+      {kode:"004.00597", nama:"ABRASIVE Pasta Sekir Klep", stok:2, harga:"25.000", kategori:"Umum", upc:"8998990017882"},
+      {kode:"080.00002", nama:"ATS Kunci Pas Ring 12 mm", stok:3, harga:"20.000", kategori:"Umum", upc:"8998990001843"},
+      {kode:"004.00317", nama:"Abu 1 Kubik", stok:-5, harga:"350.000", kategori:"Umum", upc:""},
+      {kode:"025.00268", nama:"Amplas Home Care P100", stok:31, harga:"5.000", kategori:"AVIAN", upc:""}
+    ];
+
+    function renderTable(filteredData = dataBarang) {
+      const tbody = document.querySelector("#barangTable tbody");
+      tbody.innerHTML = "";
+      filteredData.forEach((item, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><input value="${item.kode}" onchange="updateData(${index}, 'kode', this.value)"></td>
+          <td><input value="${item.nama}" onchange="updateData(${index}, 'nama', this.value)"></td>
+          <td><input value="${item.stok}" onchange="updateData(${index}, 'stok', this.value)"></td>
+          <td><input value="${item.harga}" onchange="updateData(${index}, 'harga', this.value)"></td>
+          <td><input value="${item.kategori}" onchange="updateData(${index}, 'kategori', this.value)"></td>
+          <td><input value="${item.upc}" onchange="updateData(${index}, 'upc', this.value)"></td>
+          <td><button onclick="hapusBaris(${index})">Hapus</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function updateData(index, field, value) {
+      dataBarang[index][field] = value;
+    }
+
+    function tambahBaris() {
+      dataBarang.push({kode:"", nama:"", stok:0, harga:"", kategori:"", upc:""});
+      renderTable();
+    }
+
+    function hapusBaris(index) {
+      dataBarang.splice(index, 1);
+      renderTable();
+    }
+
+    function filterBarang() {
+      const keyword = document.getElementById("searchBox").value.toLowerCase();
+      const kategori = document.getElementById("filterKategori").value;
+      const hasil = dataBarang.filter(item =>
+        (item.kode.toLowerCase().includes(keyword) ||
+         item.nama.toLowerCase().includes(keyword) ||
+         item.kategori.toLowerCase().includes(keyword) ||
+         item.upc.toLowerCase().includes(keyword)) &&
+        (kategori === "" || item.kategori === kategori)
+      );
+      renderTable(hasil);
+    }
+
+    renderTable();
+  </script>
+</body>
+</html>
